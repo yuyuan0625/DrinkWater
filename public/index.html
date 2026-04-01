@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💧 飲水紀錄 | Drank a Glass?</title>
+    <!-- Modern font -->
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Visual wave effect background -->
+        <div class="wave"></div>
+        <div class="wave"></div>
+        <div class="wave"></div>
+        
+        <div class="content">
+            <div class="header">
+                <h1>今日飲水紀錄</h1>
+                <p>保持水分，保持健康</p>
+            </div>
+            
+            <div class="counter-display">
+                <span class="count" id="water-count">0</span>
+                <span class="unit">杯</span>
+            </div>
+            
+            <button id="drink-btn" class="drink-btn">
+                <span class="btn-text">喝了一杯水</span>
+                <span class="btn-icon">💧</span>
+            </button>
+            
+            <div id="status-message" class="status-message"></div>
+        </div>
+    </div>
+    
+    <script src="script.js"></script>
+</body>
+</html>

@@ -1,0 +1,217 @@
+/* Color Palette: Water blue tones */
+:root {
+  --primary-blue: #4facfe;
+  --secondary-blue: #00f2fe;
+  --dark-blue: #0288d1;
+  --bg-color: #e0f2f1; /* Light cyan background */
+  --text-main: #334e68;
+  --text-sub: #627d98;
+  --white: #ffffff;
+  --shadow: rgba(0, 150, 255, 0.2);
+}
+
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  font-family: 'Roboto', sans-serif;
+  background: var(--bg-color);
+  color: var(--text-main);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  min-height: 100vh;
+  overflow: hidden;
+}
+
+/* Glassmorphism Container */
+.container {
+  position: relative;
+  width: 90%;
+  max-width: 400px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  border-radius: 24px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05), 
+              0 20px 40px var(--shadow);
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.3);
+  z-index: 10;
+}
+
+.content {
+  position: relative;
+  z-index: 2;
+  padding: 40px 30px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+
+.header h1 {
+  font-size: 28px;
+  margin-bottom: 8px;
+  color: var(--dark-blue);
+  font-weight: 700;
+}
+
+.header p {
+  color: var(--text-sub);
+  font-size: 14px;
+}
+
+.counter-display {
+  margin: 40px 0;
+  position: relative;
+  width: 180px;
+  height: 180px;
+  background: linear-gradient(135deg, var(--white) 0%, #f0f8ff 100%);
+  border-radius: 50%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  box-shadow: inset 0 0 20px var(--shadow),
+              0 15px 35px rgba(0, 0, 0, 0.05);
+  border: 4px solid var(--white);
+}
+
+.count {
+  font-size: 72px;
+  font-weight: 700;
+  color: var(--primary-blue);
+  line-height: 1;
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.05);
+}
+
+.unit {
+  font-size: 24px;
+  color: var(--text-sub);
+  margin-left: 5px;
+  margin-top: 30px;
+}
+
+/* Drinking Button with animations */
+.drink-btn {
+  background: linear-gradient(135deg, var(--primary-blue) 0%, var(--secondary-blue) 100%);
+  color: var(--white);
+  border: none;
+  padding: 16px 32px;
+  font-size: 18px;
+  font-weight: 600;
+  border-radius: 50px;
+  cursor: pointer;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  width: 100%;
+  box-shadow: 0 10px 20px var(--shadow);
+  transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.drink-btn::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: rgba(255, 255, 255, 0.2);
+  transform: translateX(-100%);
+  transition: transform 0.3s ease;
+}
+
+.drink-btn:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 15px 25px rgba(79, 172, 254, 0.4);
+}
+
+.drink-btn:hover::after {
+  transform: translateX(0);
+}
+
+.drink-btn:active {
+  transform: translateY(1px);
+  box-shadow: 0 5px 10px var(--shadow);
+}
+
+.btn-icon {
+  font-size: 22px;
+}
+
+/* Add a ripple animation on click */
+.btn-animate {
+  animation: pop 0.4s ease-out forwards;
+}
+
+@keyframes pop {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.status-message {
+  margin-top: 15px;
+  font-size: 14px;
+  color: var(--dark-blue);
+  height: 20px;
+  opacity: 0;
+  transition: opacity 0.3s;
+}
+
+.status-message.show {
+  opacity: 1;
+}
+
+/* Background water waves */
+.wave {
+  opacity: 0.1;
+  position: absolute;
+  top: -30%;
+  left: 50%;
+  width: 500px;
+  height: 500px;
+  margin-left: -250px;
+  margin-top: -250px;
+  background: var(--primary-blue);
+  border-radius: 43%;
+  animation: spin 10s infinite linear;
+  z-index: 1;
+}
+
+.wave:nth-child(2) {
+  animation: spin 12s infinite linear;
+  background: var(--secondary-blue);
+  border-radius: 40%;
+  opacity: 0.15;
+}
+
+.wave:nth-child(3) {
+  animation: spin 15s infinite linear;
+  background: var(--dark-blue);
+  border-radius: 46%;
+  opacity: 0.1;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Count change animation */
+.count-update {
+  animation: countPop 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@keyframes countPop {
+  0% { transform: scale(1); opacity: 0.8; }
+  50% { transform: scale(1.2); color: var(--secondary-blue); opacity: 1; }
+  100% { transform: scale(1); opacity: 1; }
+}
