@@ -65,6 +65,28 @@ body {
   font-size: 14px;
 }
 
+/* Back today button */
+.back-today-btn {
+  background: var(--dark-blue);
+  color: var(--white);
+  border: none;
+  padding: 5px 12px;
+  border-radius: 12px;
+  font-size: 13px;
+  margin-top: 10px;
+  cursor: pointer;
+  opacity: 0;
+  pointer-events: none;
+  transition: all 0.3s;
+}
+.back-today-btn.show {
+  opacity: 1;
+  pointer-events: auto;
+}
+.back-today-btn:hover {
+  background: var(--primary-blue);
+}
+
 .counter-display {
   margin: 40px 0;
   position: relative;
@@ -415,10 +437,12 @@ body {
   background: #f8f9fa;
   font-size: 13px;
   position: relative;
-  transition: transform 0.2s;
+  transition: transform 0.2s, box-shadow 0.2s;
+  cursor: pointer;
 }
 .calendar-day:hover:not(.empty) {
   transform: scale(1.05);
+  box-shadow: 0 4px 10px rgba(0,0,0,0.1);
 }
 .calendar-day .day-num {
   font-weight: 700;

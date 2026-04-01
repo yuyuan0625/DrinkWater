@@ -18,8 +18,9 @@
         <button id="calendar-toggle-btn" class="calendar-toggle-btn" title="查看紀錄">📅</button>
         <div class="content">
             <div class="header">
-                <h1>今日飲水紀錄</h1>
-                <p>保持水分，保持健康</p>
+                <h1 id="main-title">今日飲水紀錄</h1>
+                <p id="main-subtitle">保持水分，保持健康</p>
+                <button id="back-today-btn" class="back-today-btn">返回今日 <small>↩</small></button>
             </div>
             
             <div class="counter-display">
@@ -31,12 +32,12 @@
             </div>
             
             <button id="drink-btn" class="drink-btn">
-                <span class="btn-text">喝了一杯水</span>
+                <span class="btn-text" id="drink-btn-text">喝了一杯水</span>
                 <span class="btn-icon">💧</span>
             </button>
             
             <button id="remove-btn" class="remove-btn">
-                <span class="btn-text">減少一杯水</span>
+                <span class="btn-text" id="remove-btn-text">減少一杯水</span>
                 <span class="btn-icon">🚱</span>
             </button>
             

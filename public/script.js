@@ -5,6 +5,13 @@ document.addEventListener('DOMContentLoaded', () => {
     const statusMsg = document.getElementById('status-message');
     const waterFill = document.getElementById('water-fill');
     
+    // New Elements
+    const mainTitle = document.getElementById('main-title');
+    const mainSubtitle = document.getElementById('main-subtitle');
+    const backTodayBtn = document.getElementById('back-today-btn');
+    const drinkBtnText = document.getElementById('drink-btn-text');
+    const removeBtnText = document.getElementById('remove-btn-text');
+    
     // Calendar Elements
     const calendarToggleBtn = document.getElementById('calendar-toggle-btn');
     const calendarModal = document.getElementById('calendar-modal');
@@ -15,15 +22,26 @@ document.addEventListener('DOMContentLoaded', () => {
     const nextMonthBtn = document.getElementById('next-month-btn');
 
     let currentCalendarDate = new Date();
+    
+    // Helper
+    function getLocalToday() {
+        const d = new Date();
+        return `${d.getFullYear()}-${(d.getMonth() + 1).toString().padStart(2, '0')}-${d.getDate().toString().padStart(2, '0')}`;
+    }
+    
+    let selectedDate = getLocalToday();
 
     // Load initial data
-    fetchTodayCount();
+    fetchDailyCount(selectedDate);
 
     // Bind click event
     drinkBtn.addEventListener('click', recordDrink);
     removeBtn.addEventListener('click', removeDrink);
     calendarToggleBtn.addEventListener('click', openCalendar);
     closeModalBtn.addEventListener('click', closeCalendar);
+    backTodayBtn.addEventListener('click', () => {
+        selectDate(getLocalToday());
+    });
     
     prevMonthBtn.addEventListener('click', () => {
         currentCalendarDate.setMonth(currentCalendarDate.getMonth() - 1);
@@ -41,8 +59,8 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    function fetchTodayCount() {
-        fetch('/api/water/today')
+    function fetchDailyCount(dateParam) {
+        fetch(`/api/water/daily?date=${dateParam}`)
             .then(res => res.json())
             .then(data => {
                 if (data.count !== undefined) {
@@ -56,9 +74,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function removeDrink() {
-        // Add click animation
         removeBtn.classList.remove('btn-animate');
-        // trigger reflow
         void removeBtn.offsetWidth;
         removeBtn.classList.add('btn-animate');
         
@@ -66,15 +82,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch('/api/water/remove', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: selectedDate })
         })
         .then(res => res.json())
         .then(data => {
             if (data.success) {
                 updateDisplay(data.count, true);
-                showStatus('沒事，已經幫您取消一筆紀錄了 🚱');
+                showStatus(selectedDate === getLocalToday() ? '沒事，已經幫您取消一筆紀錄了 🚱' : '已刪除歷史紀錄 🚱');
             } else {
                 showStatus(data.error || '紀錄取消失敗，請再試一次', true);
             }
@@ -89,9 +104,7 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function recordDrink() {
-        // Add click animation
         drinkBtn.classList.remove('btn-animate');
-        // trigger reflow
         void drinkBtn.offsetWidth;
         drinkBtn.classList.add('btn-animate');
         
@@ -99,15 +112,14 @@ document.addEventListener('DOMContentLoaded', () => {
 
         fetch('/api/water/drink', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            }
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ date: selectedDate })
         })
         .then(res => res.json())
         .then(data => {
             if (data.success) {
                 updateDisplay(data.count, true);
-                showStatus('太棒了！已新增一筆紀錄 💧');
+                showStatus(selectedDate === getLocalToday() ? '太棒了！已新增一筆紀錄 💧' : '太棒了！歷史補登成功 💧');
             } else {
                 showStatus('紀錄失敗，請再試一次', true);
             }
@@ -139,7 +151,6 @@ document.addEventListener('DOMContentLoaded', () => {
         statusMsg.style.color = isError ? '#e53935' : 'var(--dark-blue)';
         statusMsg.classList.add('show');
         
-        // Hide after 3 seconds
         setTimeout(() => {
             statusMsg.classList.remove('show');
         }, 3000);
@@ -148,12 +159,37 @@ document.addEventListener('DOMContentLoaded', () => {
     // Calendar Functions
     function openCalendar() {
         calendarModal.classList.add('show');
-        currentCalendarDate = new Date(); // reload as current month when opening
+        currentCalendarDate = selectedDate ? new Date(selectedDate) : new Date(); 
         renderCalendar();
     }
     
     function closeCalendar() {
         calendarModal.classList.remove('show');
+    }
+    
+    function selectDate(dateStr) {
+        selectedDate = dateStr;
+        closeCalendar();
+        
+        const todayStr = getLocalToday();
+        if (dateStr === todayStr) {
+            mainTitle.innerText = '今日飲水紀錄';
+            mainSubtitle.innerText = '保持水分，保持健康';
+            drinkBtnText.innerText = '喝了一杯水';
+            removeBtnText.innerText = '減少一杯水';
+            backTodayBtn.classList.remove('show');
+        } else {
+            const parts = dateStr.split('-');
+            const m = parseInt(parts[1], 10);
+            const d = parseInt(parts[2], 10);
+            mainTitle.innerText = `${m} / ${d} 飲水紀錄`;
+            mainSubtitle.innerText = '歷史補登模式';
+            drinkBtnText.innerText = '補登一杯';
+            removeBtnText.innerText = '取消補登';
+            backTodayBtn.classList.add('show');
+        }
+        
+        fetchDailyCount(selectedDate);
     }
     
     function renderCalendar() {
@@ -187,9 +223,7 @@ document.addEventListener('DOMContentLoaded', () => {
         const startingDayOfWeek = firstDay.getDay(); 
         const totalDays = lastDay.getDate();
         
-        const today = new Date();
-        const isCurrentMonth = today.getFullYear() === year && (today.getMonth() + 1) === month;
-        const currentDayNum = today.getDate();
+        const todayStr = getLocalToday();
         
         for (let i = 0; i < startingDayOfWeek; i++) {
             const emptyCell = document.createElement('div');
@@ -207,14 +241,22 @@ document.addEventListener('DOMContentLoaded', () => {
             if (count > 0) {
                 dayCell.classList.add('has-record');
             }
-            if (isCurrentMonth && i === currentDayNum) {
+            if (dateString === todayStr) {
                 dayCell.classList.add('today');
+            }
+            if (dateString === selectedDate && selectedDate !== todayStr) {
+                // optional style for selected past date
+                dayCell.style.border = '2px dashed var(--primary-blue)';
             }
             
             dayCell.innerHTML = `
                 <span class="day-num">${i}</span>
                 <span class="drink-count">${count} 杯</span>
             `;
+            
+            dayCell.addEventListener('click', () => {
+                selectDate(dateString);
+            });
             
             calendarGrid.appendChild(dayCell);
         }
