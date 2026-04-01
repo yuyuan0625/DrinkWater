@@ -1,0 +1,108 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>登入 | 💧 飲水紀錄</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="auth-container">
+        <h2 id="auth-title" style="margin-top:0;">✨ 登入您的帳號</h2>
+        
+        <div class="auth-error" id="auth-error">發生錯誤</div>
+
+        <div class="input-group">
+            <label for="username">帳號 (Username)</label>
+            <input type="text" id="username" placeholder="請輸入帳號" required>
+        </div>
+        
+        <div class="input-group">
+            <label for="password">密碼 (Password)</label>
+            <input type="password" id="password" placeholder="請設定或輸入密碼" required>
+        </div>
+
+        <button class="auth-btn" id="auth-submit-btn">登入</button>
+
+        <div class="auth-toggle">
+            <span id="auth-toggle-text">還沒有帳號嗎？</span> 
+            <a id="auth-toggle-link">創建帳號</a>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const authTitle = document.getElementById('auth-title');
+            const authError = document.getElementById('auth-error');
+            const authSubmitBtn = document.getElementById('auth-submit-btn');
+            const authToggleText = document.getElementById('auth-toggle-text');
+            const authToggleLink = document.getElementById('auth-toggle-link');
+            const usernameInput = document.getElementById('username');
+            const passwordInput = document.getElementById('password');
+
+            let isLoginMode = true;
+
+            authToggleLink.addEventListener('click', () => {
+                isLoginMode = !isLoginMode;
+                if (isLoginMode) {
+                    authTitle.innerText = '✨ 登入您的帳號';
+                    authSubmitBtn.innerText = '登入';
+                    authToggleText.innerText = '還沒有帳號嗎？';
+                    authToggleLink.innerText = '創建帳號';
+                } else {
+                    authTitle.innerText = '🚀 創建新帳號';
+                    authSubmitBtn.innerText = '免費註冊';
+                    authToggleText.innerText = '已經有帳號了？';
+                    authToggleLink.innerText = '立即登入';
+                }
+                authError.classList.remove('show');
+            });
+
+            authSubmitBtn.addEventListener('click', () => {
+                const username = usernameInput.value.trim();
+                const password = passwordInput.value.trim();
+
+                if (!username || !password) {
+                    showError('請完整輸入帳號和密碼！');
+                    return;
+                }
+
+                authSubmitBtn.disabled = true;
+                const endpoint = isLoginMode ? '/api/auth/login' : '/api/auth/register';
+
+                fetch(endpoint, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ username, password })
+                })
+                .then(res => res.json())
+                .then(data => {
+                    authSubmitBtn.disabled = false;
+                    if (data.success) {
+                        if (isLoginMode) {
+                            localStorage.setItem('token', data.token);
+                            localStorage.setItem('username', data.username);
+                            window.location.href = '/index.html';
+                        } else {
+                            // Automatically switch to login mode on successful registration
+                            alert('註冊成功！系統將為您切換至登入模式，請直接登入');
+                            authToggleLink.click();
+                        }
+                    } else {
+                        showError(data.error);
+                    }
+                })
+                .catch(err => {
+                    authSubmitBtn.disabled = false;
+                    showError('系統錯誤，請稍後再試！');
+                });
+            });
+
+            function showError(msg) {
+                authError.innerText = msg;
+                authError.classList.add('show');
+            }
+        });
+    </script>
+</body>
+</html>
