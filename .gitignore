@@ -1,2 +1,4 @@
 node_modules/
 *.cmd
+*.mov
+*.mp4
