@@ -209,8 +209,35 @@ app.post('/api/water/drink', requireAuth, (req, res) => {
   });
 });
 
+app.get('/', (req, res) => {
+    res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+// Render 的 Web Service 在啟動時會自動加入 RENDER_EXTERNAL_URL 的環境變數
+// 我們將預設值綁定了您的專屬網址，確保能正確喚醒真實伺服器
+const pingUrl = process.env.RENDER_EXTERNAL_URL || 'https://drinkwater-pp26.onrender.com/';
+
+// 防止 Render 免費方案休眠的機制：每 14 分鐘執行一次
+setInterval(() => {
+    // 轉換當前時間為台灣時間 (UTC+8)
+    const taiwanTime = new Date(new Date().toLocaleString('en-US', { timeZone: 'Asia/Taipei' }));
+    const hours = taiwanTime.getHours();
+    const minutes = taiwanTime.getMinutes();
+    
+    const currentMins = hours * 60 + minutes;
+    const startMins = 8 * 60 + 30; // 08:30
+    const endMins = 22 * 60;       // 22:00
+    
+    if (currentMins >= startMins && currentMins <= endMins) {
+        console.log(`[Keep-alive] 執行自我喚醒 ping -> ${pingUrl} , 台灣時間: ${taiwanTime.toLocaleTimeString()}`);
+        fetch(pingUrl)
+            .then(res => console.log(`[Keep-alive] 回應狀態碼: ${res.status}`))
+            .catch(err => console.error(`[Keep-alive] 喚醒失敗:`, err.message));
+    }
+}, 14 * 60 * 1000); // 14 * 60 * 1000 = 14 分鐘
+
 app.listen(port, () => {
-  console.log(`Server is running at http://localhost:${port}`);
+    console.log(`Server is running at http://localhost:${port}`);
 });
 process.on('SIGINT', () => {
   db.close(() => process.exit(0));
