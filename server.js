@@ -167,6 +167,24 @@ app.get('/api/water/month', requireAuth, (req, res) => {
   });
 });
 
+app.get('/api/water/leaderboard', requireAuth, (req, res) => {
+  const targetDate = req.query.date || getLocalToday();
+  const query = `
+    SELECT u.username, COUNT(w.id) as count 
+    FROM water_logs w
+    JOIN users u ON w.user_id = u.id
+    WHERE date(w.timestamp, 'localtime') = ?
+    GROUP BY u.id
+    ORDER BY count DESC, u.username ASC
+    LIMIT 100
+  `;
+  
+  db.all(query, [targetDate], (err, rows) => {
+    if (err) return res.status(500).json({ error: 'Database error' });
+    res.json(rows);
+  });
+});
+
 app.post('/api/water/remove', requireAuth, (req, res) => {
   const targetDate = req.body.date || getLocalToday();
   const query = `

@@ -60,6 +60,11 @@ document.addEventListener('DOMContentLoaded', () => {
     const closeAdminModal = document.getElementById('close-admin-modal');
     const adminUserList = document.getElementById('admin-user-list');
 
+    const leaderboardToggleBtn = document.getElementById('leaderboard-toggle-btn');
+    const leaderboardModal = document.getElementById('leaderboard-modal');
+    const closeLeaderboardModalBtn = document.getElementById('close-leaderboard-modal');
+    const leaderboardList = document.getElementById('leaderboard-list');
+
     let currentCalendarDate = new Date();
     
     function getLocalToday() {
@@ -103,12 +108,24 @@ document.addEventListener('DOMContentLoaded', () => {
         adminModal.classList.remove('show');
     });
 
+    leaderboardToggleBtn.addEventListener('click', () => {
+        leaderboardModal.classList.add('show');
+        loadLeaderboard();
+    });
+
+    closeLeaderboardModalBtn.addEventListener('click', () => {
+        leaderboardModal.classList.remove('show');
+    });
+
     window.addEventListener('click', (e) => {
         if (e.target === calendarModal) {
             closeCalendar();
         }
         if (e.target === adminModal) {
             adminModal.classList.remove('show');
+        }
+        if (e.target === leaderboardModal) {
+            leaderboardModal.classList.remove('show');
         }
     });
 
@@ -334,7 +351,7 @@ document.addEventListener('DOMContentLoaded', () => {
                                 .then(res => res.json())
                                 .then(data => {
                                     if(data.success) {
-                                        loadAdminUsers();
+        loadAdminUsers();
                                     } else {
                                         alert(data.error || '刪除失敗');
                                         e.target.disabled = false;
@@ -350,6 +367,51 @@ document.addEventListener('DOMContentLoaded', () => {
             })
             .catch(err => {
                 if(err.message !== 'Unauthorized') adminUserList.innerHTML = '<li style="text-align:center; padding: 20px; color: #ff5f6d;">系統錯誤或權限不足</li>';
+            });
+    }
+
+    // === LEADERBOARD LOGIC ===
+    function loadLeaderboard() {
+        leaderboardList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-sub);">讀取中...</li>';
+        
+        fetch(`/api/water/leaderboard?date=${getLocalToday()}`, { headers })
+            .then(handleApiError)
+            .then(res => res.json())
+            .then(rankings => {
+                leaderboardList.innerHTML = '';
+                
+                if (rankings.length === 0) {
+                    leaderboardList.innerHTML = '<li style="text-align:center; padding: 20px; color: var(--text-sub);">今日尚無任何人飲水，快成為第一個吧！</li>';
+                    return;
+                }
+                
+                let lastCount = -1;
+                let displayRank = 1;
+                
+                rankings.forEach((user, index) => {
+                    if (lastCount !== -1 && user.count !== lastCount) {
+                        displayRank = index + 1;
+                    }
+                    lastCount = user.count;
+                    
+                    const li = document.createElement('li');
+                    li.className = `leaderboard-item rank-${displayRank <= 3 ? displayRank : 'other'}`;
+                    
+                    let rankIcon = displayRank;
+                    if (displayRank === 1) rankIcon = '🥇';
+                    else if (displayRank === 2) rankIcon = '🥈';
+                    else if (displayRank === 3) rankIcon = '🥉';
+                    
+                    li.innerHTML = `
+                        <div class="leaderboard-rank">${rankIcon}</div>
+                        <div class="leaderboard-name">${user.username} ${user.username === username ? '(你)' : ''}</div>
+                        <div class="leaderboard-count">${user.count} 杯</div>
+                    `;
+                    leaderboardList.appendChild(li);
+                });
+            })
+            .catch(err => {
+                if(err.message !== 'Unauthorized') leaderboardList.innerHTML = '<li style="text-align:center; padding: 20px; color: #ff5f6d;">系統錯誤，無法取得排行榜</li>';
             });
     }
 });

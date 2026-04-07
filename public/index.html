@@ -16,8 +16,11 @@
         <div class="wave"></div>
         
         <button id="user-auth-btn" class="user-auth-btn" title="使用者選單">👤 未登入</button>
-        <button id="admin-toggle-btn" class="calendar-toggle-btn admin-btn" title="管理設定" style="display: none;">⚙️</button>
-        <button id="calendar-toggle-btn" class="calendar-toggle-btn" title="查看紀錄">📅</button>
+        <div class="top-right-actions">
+            <button id="admin-toggle-btn" class="action-btn" title="管理設定" style="display: none;">⚙️</button>
+            <button id="leaderboard-toggle-btn" class="action-btn" title="排行榜">🏆</button>
+            <button id="calendar-toggle-btn" class="action-btn" title="查看紀錄">📅</button>
+        </div>
         <div class="content">
             <div class="header">
                 <h1 id="main-title">今日飲水紀錄</h1>
@@ -75,6 +78,21 @@
             <div class="admin-user-list-container">
                 <ul id="admin-user-list" class="admin-user-list">
                     <!-- Users will be populated here -->
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Leaderboard Modal -->
+    <div id="leaderboard-modal" class="modal">
+        <div class="modal-content">
+            <span id="close-leaderboard-modal" class="close-btn">&times;</span>
+            <div class="calendar-header" style="justify-content: center; margin-bottom: 15px;">
+                <h2 style="font-size: 22px;">🏆 今日排行榜</h2>
+            </div>
+            <div class="leaderboard-container">
+                <ul id="leaderboard-list" class="leaderboard-list">
+                    <!-- Leaderboard will be populated here -->
                 </ul>
             </div>
         </div>
