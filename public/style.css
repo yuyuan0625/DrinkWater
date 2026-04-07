@@ -130,9 +130,9 @@ body {
   height: 20px;
   top: -19px;
   left: 0;
-  background-repeat: repeat-x;
-  background-size: 50% 100%;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q25 0 50 10 T100 10 L100 20 L0 20 Z' fill='%239addf5'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-size: 100% 100%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 20' preserveAspectRatio='none'%3E%3Cpath d='M0 10 Q25 0 50 10 T100 10 T150 10 T200 10 L200 20 L0 20 Z' fill='%239addf5'/%3E%3C/svg%3E");
   animation: waveAnim 4s linear infinite;
   z-index: 2;
 }
