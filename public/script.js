@@ -59,6 +59,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const adminModal = document.getElementById('admin-modal');
     const closeAdminModal = document.getElementById('close-admin-modal');
     const adminUserList = document.getElementById('admin-user-list');
+    const downloadDbBtn = document.getElementById('download-db-btn');
 
     const leaderboardToggleBtn = document.getElementById('leaderboard-toggle-btn');
     const leaderboardModal = document.getElementById('leaderboard-modal');
@@ -107,6 +108,41 @@ document.addEventListener('DOMContentLoaded', () => {
     closeAdminModal.addEventListener('click', () => {
         adminModal.classList.remove('show');
     });
+
+    if (downloadDbBtn) {
+        downloadDbBtn.addEventListener('click', () => {
+            downloadDbBtn.disabled = true;
+            const originalText = downloadDbBtn.innerText;
+            downloadDbBtn.innerText = '下載中...';
+            
+            fetch('/api/admin/backup', { headers })
+                .then(res => {
+                    if (res.status === 401 || res.status === 403) {
+                        handleApiError(res);
+                    }
+                    if (!res.ok) throw new Error('下載資料庫失敗');
+                    return res.blob();
+                })
+                .then(blob => {
+                    const url = window.URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.style.display = 'none';
+                    a.href = url;
+                    a.download = 'database.sqlite';
+                    document.body.appendChild(a);
+                    a.click();
+                    window.URL.revokeObjectURL(url);
+                    document.body.removeChild(a);
+                })
+                .catch(err => {
+                    if(err.message !== 'Unauthorized') alert(err.message || '下載時發生錯誤');
+                })
+                .finally(() => {
+                    downloadDbBtn.disabled = false;
+                    downloadDbBtn.innerText = originalText;
+                });
+        });
+    }
 
     leaderboardToggleBtn.addEventListener('click', () => {
         leaderboardModal.classList.add('show');

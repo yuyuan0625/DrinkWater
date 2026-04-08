@@ -70,6 +70,16 @@ app.delete('/api/admin/users/:id', requireAuth, requireAdmin, (req, res) => {
   });
 });
 
+app.get('/api/admin/backup', requireAuth, requireAdmin, (req, res) => {
+  res.download(dbPath, 'database.sqlite', (err) => {
+      if (err) {
+          if (!res.headersSent) {
+              res.status(500).json({ error: 'Failed to download database' });
+          }
+      }
+  });
+});
+
 // Middleware to protect routes
 function requireAuth(req, res, next) {
     const authHeader = req.headers.authorization;
